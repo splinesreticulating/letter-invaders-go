@@ -23,7 +23,7 @@ go build
 ## Usage
 
 ```bash
-# Run with default dictionary (full dictionary)
+# Run with default dictionary (uses /usr/share/dict/words)
 ./letter-invaders-go
 
 # Use the short words dictionary (great for kids!)

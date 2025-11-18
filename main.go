@@ -288,7 +288,7 @@ func (m model) renderGameOver() string {
 }
 
 func main() {
-	dictPath := flag.String("d", "short_words.txt", "Path to dictionary file")
+	dictPath := flag.String("d", "/usr/share/dict/words", "Path to dictionary file")
 	flag.Parse()
 
 	dict, err := loadDictionary(*dictPath)

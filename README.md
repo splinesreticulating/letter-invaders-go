@@ -35,9 +35,9 @@ go build
 
 ## Controls
 
-- **Type letters** - Match and destroy falling words
+- **Type letters** - Match and destroy falling words (including 'p'!)
 - **Backspace** - Clear current input
-- **p** - Pause/resume game
+- **Ctrl+P** - Pause/resume game
 - **Ctrl+L** - Redraw screen
 - **q or Ctrl+C** - Quit
 

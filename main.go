@@ -100,7 +100,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "ctrl+l":
 			return m, tea.ClearScreen
-		case "p":
+		case "ctrl+p":
+			// Use Ctrl+P for pause to avoid conflicts with typing 'p'
 			m.paused = !m.paused
 			return m, nil
 		case "backspace":
@@ -110,7 +111,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.current = nil
 			return m, nil
 		default:
-			// Handle letter input
+			// Handle letter input (including 'p')
 			if len(msg.String()) == 1 && msg.String() >= "a" && msg.String() <= "z" {
 				m.input += msg.String()
 				m = m.matchWord()
@@ -267,10 +268,10 @@ func (m model) View() string {
 	b.WriteString(status)
 
 	if m.paused {
-		b.WriteString("\n\n[PAUSED - Press 'p' to resume]")
+		b.WriteString("\n\n[PAUSED - Press Ctrl+P to resume]")
 	}
 
-	b.WriteString("\n\n[ctrl+c/q: quit | p: pause | ctrl+l: redraw]")
+	b.WriteString("\n\n[ctrl+c/q: quit | ctrl+p: pause | ctrl+l: redraw]")
 
 	return b.String()
 }

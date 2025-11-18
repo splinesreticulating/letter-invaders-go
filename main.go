@@ -100,8 +100,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "ctrl+l":
 			return m, tea.ClearScreen
-		case "ctrl+p":
-			// Use Ctrl+P for pause to avoid conflicts with typing 'p'
+		case " ":
+			// Space bar pauses - can't conflict with typing words
 			m.paused = !m.paused
 			return m, nil
 		case "backspace":
@@ -268,10 +268,10 @@ func (m model) View() string {
 	b.WriteString(status)
 
 	if m.paused {
-		b.WriteString("\n\n[PAUSED - Press Ctrl+P to resume]")
+		b.WriteString("\n\n[PAUSED - Press SPACE to resume]")
 	}
 
-	b.WriteString("\n\n[ctrl+c/q: quit | ctrl+p: pause | ctrl+l: redraw]")
+	b.WriteString("\n\n[ctrl+c/q: quit | SPACE: pause | ctrl+l: redraw]")
 
 	return b.String()
 }

@@ -23,8 +23,11 @@ go build
 ## Usage
 
 ```bash
-# Run with default dictionary
+# Run with default dictionary (full dictionary)
 ./letter-invaders-go
+
+# Use the short words dictionary (great for kids!)
+./letter-invaders-go -d short_words.txt
 
 # Use a custom dictionary
 ./letter-invaders-go -d /path/to/dictionary.txt
@@ -40,7 +43,7 @@ go build
 
 ## Dictionary Format
 
-The dictionary file should contain one word per line. Words are automatically filtered to 1-3 letters.
+The dictionary file should contain one word per line. The included `short_words.txt` contains 1-3 letter words, perfect for beginners and young children.
 
 ## Credits
 

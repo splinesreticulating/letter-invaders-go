@@ -45,7 +45,7 @@ type model struct {
 type tickMsg time.Time
 
 func tickCmd() tea.Cmd {
-	return tea.Tick(500*time.Millisecond, func(t time.Time) tea.Msg {
+	return tea.Tick(1000*time.Millisecond, func(t time.Time) tea.Msg {
 		return tickMsg(t)
 	})
 }
@@ -187,12 +187,12 @@ func (m model) moveWords() model {
 }
 
 func (m model) maybeAddWord() model {
-	if len(m.words) >= 10 {
+	if len(m.words) >= 8 {
 		return m
 	}
 
-	// Probability increases with level
-	if rand.Float64() < 0.15+float64(m.level)*0.02 {
+	// Probability increases with level (reduced base probability)
+	if rand.Float64() < 0.08+float64(m.level)*0.01 {
 		newWord := m.dict[rand.Intn(len(m.dict))]
 		maxX := screenWidth - len(newWord) - 1
 		if maxX < 0 {

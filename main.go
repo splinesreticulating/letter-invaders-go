@@ -61,7 +61,8 @@ func loadDictionary(path string) ([]string, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		word := strings.TrimSpace(scanner.Text())
-		if len(word) > 0 {
+		// Filter for reasonable word lengths (3-12 chars) for better gameplay
+		if len(word) >= 3 && len(word) <= 12 {
 			words = append(words, strings.ToLower(word))
 		}
 	}
@@ -191,8 +192,11 @@ func (m model) maybeAddWord() model {
 		return m
 	}
 
-	// Probability increases with level (reduced base probability)
-	if rand.Float64() < 0.08+float64(m.level)*0.01 {
+	// Ensure minimum words on screen, then use probability for additional spawns
+	minWords := 1 + m.level/3
+	shouldSpawn := len(m.words) < minWords || rand.Float64() < 0.08+float64(m.level)*0.01
+
+	if shouldSpawn {
 		newWord := m.dict[rand.Intn(len(m.dict))]
 		maxX := screenWidth - len(newWord) - 1
 		if maxX < 0 {

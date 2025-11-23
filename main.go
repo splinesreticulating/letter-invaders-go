@@ -225,9 +225,9 @@ func (m model) View() string {
 		}
 	}
 
-	// Draw words
-	highlightStyle := lipgloss.NewStyle().Background(lipgloss.Color("5")).Foreground(lipgloss.Color("15"))
-	normalStyle := lipgloss.NewStyle()
+	// Draw words with cyan/white/grey color scheme
+	highlightStyle := lipgloss.NewStyle().Background(lipgloss.Color("#00FFFF")).Foreground(lipgloss.Color("#000000")).Bold(true)
+	wordStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#00CED1"))
 
 	for _, w := range m.words {
 		if w.y >= 0 && w.y < gameHeight {
@@ -253,14 +253,22 @@ func (m model) View() string {
 			if m.current.x+len(m.current.text) < len(line) {
 				after = line[m.current.x+len(m.current.text):]
 			}
-			line = before + highlightStyle.Render(matched) + normalStyle.Render(unmatched) + after
+			line = before + highlightStyle.Render(matched) + wordStyle.Render(unmatched) + after
+		} else {
+			// Color all words on non-current lines
+			line = wordStyle.Render(line)
 		}
 		b.WriteString(line)
 		b.WriteString("\n")
 	}
 
-	// Status line
-	b.WriteString(strings.Repeat("─", screenWidth))
+	// Status line with color scheme
+	separatorStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#00CED1"))
+	statusStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#CCCCCC"))
+	pauseStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#00FFFF")).Bold(true)
+	helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#888888"))
+
+	b.WriteString(separatorStyle.Render(strings.Repeat("─", screenWidth)))
 	b.WriteString("\n")
 	elapsed := time.Since(m.startTime).Seconds()
 	wpm := 0
@@ -269,26 +277,30 @@ func (m model) View() string {
 	}
 	status := fmt.Sprintf("Score: %d  Level: %d  Lives: %d  Words: %d  WPM: %d  Input: %s",
 		m.score, m.level, m.lives, m.wordsTyped, wpm, m.input)
-	b.WriteString(status)
+	b.WriteString(statusStyle.Render(status))
 
 	if m.paused {
-		b.WriteString("\n\n[PAUSED - Press SPACE to resume]")
+		b.WriteString("\n\n" + pauseStyle.Render("[PAUSED - Press SPACE to resume]"))
 	}
 
-	b.WriteString("\n\n[ctrl+c: quit | SPACE: pause | ctrl+l: redraw]")
+	b.WriteString("\n\n" + helpStyle.Render("[ctrl+c: quit | SPACE: pause | ctrl+l: redraw]"))
 
 	return b.String()
 }
 
 func (m model) renderGameOver() string {
+	titleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#00FFFF")).Bold(true)
+	statsStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#CCCCCC"))
+	helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#888888"))
+
 	var b strings.Builder
 	b.WriteString("\n\n")
-	b.WriteString(lipgloss.NewStyle().Bold(true).Render("GAME OVER"))
+	b.WriteString(titleStyle.Render("GAME OVER"))
 	b.WriteString("\n\n")
-	b.WriteString(fmt.Sprintf("Final Score: %d\n", m.score))
-	b.WriteString(fmt.Sprintf("Level Reached: %d\n", m.level))
-	b.WriteString(fmt.Sprintf("Words Typed: %d\n", m.wordsTyped))
-	b.WriteString("\n\nPress 'q' to quit")
+	b.WriteString(statsStyle.Render(fmt.Sprintf("Final Score: %d\n", m.score)))
+	b.WriteString(statsStyle.Render(fmt.Sprintf("Level Reached: %d\n", m.level)))
+	b.WriteString(statsStyle.Render(fmt.Sprintf("Words Typed: %d\n", m.wordsTyped)))
+	b.WriteString("\n\n" + helpStyle.Render("Press 'q' to quit"))
 	return b.String()
 }
 

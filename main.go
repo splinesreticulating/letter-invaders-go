@@ -97,7 +97,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "ctrl+c":
 			return m, tea.Quit
 		case "ctrl+l":
 			return m, tea.ClearScreen
@@ -275,7 +275,7 @@ func (m model) View() string {
 		b.WriteString("\n\n[PAUSED - Press SPACE to resume]")
 	}
 
-	b.WriteString("\n\n[ctrl+c/q: quit | SPACE: pause | ctrl+l: redraw]")
+	b.WriteString("\n\n[ctrl+c: quit | SPACE: pause | ctrl+l: redraw]")
 
 	return b.String()
 }

@@ -61,8 +61,8 @@ func loadDictionary(path string) ([]string, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		word := strings.TrimSpace(scanner.Text())
-		// Filter for reasonable word lengths (3-12 chars) for better gameplay
-		if len(word) >= 3 && len(word) <= 12 {
+		// Filter for reasonable word lengths (1-12 chars) for better gameplay
+		if len(word) >= 1 && len(word) <= 12 {
 			words = append(words, strings.ToLower(word))
 		}
 	}

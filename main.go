@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"math"
 	"math/rand"
 	"os"
 	"strings"
@@ -26,8 +27,20 @@ type word struct {
 	matched int
 }
 
+type particle struct {
+	x, y     float64
+	vx, vy   float64
+	char     rune
+	lifetime int
+}
+
+type effect struct {
+	particles []particle
+}
+
 type model struct {
 	words      []word
+	effects    []effect
 	score      int
 	level      int
 	lives      int
@@ -69,9 +82,32 @@ func loadDictionary(path string) ([]string, error) {
 	return words, scanner.Err()
 }
 
+func createExplosion(x, y int, wordLen int) effect {
+	chars := []rune{'*', '+', '#', 'o', '.', '~', '^', 'x'}
+	particles := []particle{}
+
+	// Create particles radiating outward
+	numParticles := 8 + wordLen*2
+	for i := 0; i < numParticles; i++ {
+		angle := float64(i) * 2.0 * 3.14159 / float64(numParticles)
+		speed := 0.5 + rand.Float64()*1.5
+		particles = append(particles, particle{
+			x:        float64(x) + float64(i%wordLen),
+			y:        float64(y),
+			vx:       speed * math.Cos(angle),
+			vy:       speed * math.Sin(angle),
+			char:     chars[rand.Intn(len(chars))],
+			lifetime: 3 + rand.Intn(3),
+		})
+	}
+
+	return effect{particles: particles}
+}
+
 func initialModel(dict []string) model {
 	return model{
 		words:     []word{},
+		effects:   []effect{},
 		score:     0,
 		level:     1,
 		lives:     3,
@@ -123,6 +159,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		if !m.paused && !m.gameOver {
 			m = m.moveWords()
+			m = m.updateEffects()
 			m = m.maybeAddWord()
 		}
 		return m, tickCmd()
@@ -153,6 +190,10 @@ func (m model) matchWord() model {
 			if m.input == w.text {
 				m.score += len(w.text) * (m.level + 1)
 				m.wordsTyped++
+
+				// Create explosion effect at word position
+				m.effects = append(m.effects, createExplosion(w.x, w.y, len(w.text)))
+
 				m.words = append(m.words[:i], m.words[i+1:]...)
 				m.input = ""
 				m.current = nil
@@ -169,6 +210,32 @@ func (m model) matchWord() model {
 	// No match found - reset
 	m.input = ""
 	m.current = nil
+	return m
+}
+
+func (m model) updateEffects() model {
+	// Update all particles in all effects
+	for i := len(m.effects) - 1; i >= 0; i-- {
+		effect := &m.effects[i]
+
+		// Update each particle
+		for j := len(effect.particles) - 1; j >= 0; j-- {
+			p := &effect.particles[j]
+			p.x += p.vx
+			p.y += p.vy
+			p.lifetime--
+
+			// Remove dead particles
+			if p.lifetime <= 0 {
+				effect.particles = append(effect.particles[:j], effect.particles[j+1:]...)
+			}
+		}
+
+		// Remove effects with no particles left
+		if len(effect.particles) == 0 {
+			m.effects = append(m.effects[:i], m.effects[i+1:]...)
+		}
+	}
 	return m
 }
 
@@ -235,6 +302,16 @@ func (m model) View() string {
 				if w.x+i < screenWidth {
 					screen[w.y][w.x+i] = ch
 				}
+			}
+		}
+	}
+
+	// Draw explosion particles
+	for _, effect := range m.effects {
+		for _, p := range effect.particles {
+			px, py := int(p.x), int(p.y)
+			if px >= 0 && px < screenWidth && py >= 0 && py < gameHeight {
+				screen[py][px] = p.char
 			}
 		}
 	}

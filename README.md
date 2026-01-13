@@ -13,6 +13,8 @@ This is a rewrite of the classic C version using Go and the [Bubble Tea](https:/
 - Score tracking and WPM calculation
 - Clean terminal UI with highlighted words
 - Pause/resume functionality
+- ASCII explosion effect when words are completed
+- Configurable speed control for younger players (`-speed`)
 
 ## Installation
 
@@ -31,6 +33,9 @@ go build
 
 # Use a custom dictionary
 ./letter-invaders-go -d /path/to/dictionary.txt
+
+# Slow the game down (milliseconds per tick; higher = slower)
+./letter-invaders-go -speed 2000
 ```
 
 ## Controls
@@ -39,7 +44,7 @@ go build
 - **Backspace** - Clear current input
 - **SPACE** - Pause/resume game
 - **Ctrl+L** - Redraw screen
-- **q or Ctrl+C** - Quit
+- **Ctrl+C** - Quit (use **q** on the Game Over screen)
 
 ## Dictionary Format
 
